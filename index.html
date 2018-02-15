@@ -1,19 +1,18 @@
 <html>
 <head>
-<title>Project 0</title>
-<style type="text/css" href="project0.css"></style>
+<title>Project 1</title>
+<link rel="stylesheet" href="project1.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <!--Put your D3 import statement between these two lines-->
-    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="http://d3js.org/d3.v4.js" charset="utf-8"></script>
 <!--Put your D3 import statement between these two lines-->
 </head>
-
+    
 <body>
 	<div id="partOne">
         <h1>Part One: </h1>
         I've made a change!
 	</div>
-    
     <div id="partTwo">
         <h1>Part Two: </h1>
         <div id="barchart">
@@ -29,15 +28,648 @@
     
     <div id="partFive">
         <h1>Part Five: </h1>
-        <div id="scatterplotSet">
+        <div id="scatterplotOne">
+            <h1>Anscombe I: </h1>
+        </div>
+        <div id="scatterplotTwo">
+            <h1>Anscombe II: </h1>
+        </div>
+        <div id="scatterplotThree">
+            <h1>Anscombe III: </h1>
+        </div>
+        <div id="scatterplotFour">
+            <h1>Anscombe IV: </h1>
         </div>
 	</div>
     
     <script type="text/javascript">
         // Put your part one code here ***********************
+        
+        // First, we will create some constants to define non-data-related parts of the visualization
+        var w = 700; // Width of our visualization
+        var h = 500; // Height of our visualization
+        var xOffset = 40; // Space for x-axis labels
+        var yOffset = 100; // Space for y-axis labels
+        var margin = 10; // Margin around visualization
+        var vals = ['x', 'y']; // List of data attributes
+        var xVal = vals[0]; // Value to plot on x-axis
+        var yVal = vals[1]; // Value to plot on y-axis
+
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 20, right: 20, bottom: 30, left: 50};
+        var width = 960 - margin.left - margin.right;
+        var height = 500 - margin.top - margin.bottom;
+
+        // set the ranges
+        var x = d3.scaleLinear().range([0, width]);
+        var y = d3.scaleLinear().range([height, 0]);
 
         
-        // Leave this to test your data uploading. All data uploading should be above this line
+        // append the svg obgect to the body of the page
+        // appends a 'group' element to 'svg'
+        // moves the 'group' element to the top left margin
+        var svgOne = d3.select("#partOne").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform","translate("+margin.left + "," + margin.top + ")");
+        
+        var svgTwo = d3.select("#partTwo").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform","translate("+margin.left + "," + margin.top + ")");
+        
+        var svgThree = d3.select("#partThree").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform","translate("+margin.left + "," + margin.top + ")");
+        
+        var svgFour = d3.select("#partThree").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform","translate("+margin.left + "," + margin.top + ")");
+        
+        
+        //Part 5
+        
+        var svgI = d3.select("#scatterplotOne").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform","translate("+margin.left + "," + margin.top + ")");
+        
+        var svgII = d3.select("#scatterplotTwo").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform","translate("+margin.left + "," + margin.top + ")");
+        
+        var svgIII = d3.select("#scatterplotThree").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform","translate("+margin.left + "," + margin.top + ")");
+        
+        var svgIV = d3.select("#scatterplotFour").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform","translate("+margin.left + "," + margin.top + ")");
+        
+        anscombeOne = d3.csv("/projectOne_anscombesQuartet/data/anscombe_I.csv", function(error, data){
+    
+            if(error) throw error;
+            
+            //Convert string to numbers
+            data.forEach(function(d){
+                
+                d.x = +d.x
+                d.y = +d.y
+                
+            });
+        
+            //Sort data by x value
+            data.sort(function(a, b){return a.x - b.x});
+            
+            console.log(data);
+            checkDataset(data);
+             
+            //Scale the range of the data
+            x.domain([0,d3.max(data, function(d){return d.x;})])
+            y.domain([0, d3.max(data, function(d){return d.y;})])
+           
+            
+            //Create a line between datasets
+            var line = d3.line()
+            .x(function(d) { return x(d.x); })
+            .y(function(d) { return y(d.y); });
+            
+            
+        
+            // Add the scatterplot points
+            svgOne.selectAll("circle")
+               .data(data)
+               .enter()
+               .append("circle")
+               .attr("r", 5)//radius of circle
+               .attr("cx", function(d){return x(d[xVal]);})
+               .attr("cy", function(d){return y(d[yVal]);})
+               .attr("fill", "lightblue")
+               .transition()
+               //.ease(d3.easeBounce)
+               //.duration(4000)
+               //.attr("r", function(d){return d["x"]});
+
+            // Add the X Axis
+            svgOne.append("g")
+               .attr("transform", "translate(0, " + height +")")
+               .call(d3.axisBottom(x));
+            // Add the Y Axis
+            svgOne.append("g")
+               .call(d3.axisLeft(y));
+
+            // add the text labels
+            var xLabel = svgOne.append("text")
+                            .attr("class", "label")
+                            .text(xVal)
+                            .attr("x", width - 20)
+                            .attr("y", height-10);
+
+            var yLabel = svgOne.append("text")
+                            .attr("class", "label")
+                            .text(yVal)
+                            .attr("y", -10)
+                            .attr("transform", "rotate(90)")
+                            .style("text-anchor", "start");
+            
+            //append the line
+//            svgOne.append("path")
+//              .datum(data)
+//              .attr("class", "line")
+//              .attr("d", line);
+    
+        });
+        
+        // Put your part two code here ***********************
+        
+        anscombeTwo = d3.csv("/projectOne_anscombesQuartet/data/anscombe_I.csv", function(error, data){
+    
+            if(error) throw error;
+            
+            data.forEach(function(d){
+                
+                d.x = +d.x
+                d.y = +d.y
+                
+            });
+            
+            //Sort data by x value
+            data.sort(function(a, b){return a.x - b.x});
+            
+            console.log(data);
+            checkDataset(data);
+             
+            //Scale the range of the data
+            x.domain([0,d3.max(data, function(d){return d.x;})])
+            y.domain([0, d3.max(data, function(d){return d.y;})])
+           
+            
+            var line = d3.line()
+            .x(function(d) { return x(d.x); })
+            .y(function(d) { return y(d.y); });
+            
+            
+        
+            // Add the scatterplot points
+            svgTwo.selectAll("circle")
+               .data(data)
+               .enter()
+               .append("circle")
+               .attr("r", 5)//radius of circle
+               .attr("cx", function(d){return x(d[xVal]);})
+               .attr("cy", function(d){return y(d[yVal]);})
+               .attr("fill", "lightblue")
+               .transition()
+               //.ease(d3.easeBounce)
+               //.duration(4000)
+               //.attr("r", function(d){return d["x"]});
+
+            // Add the X Axis
+            svgTwo.append("g")
+               .attr("transform", "translate(0, " + height +")")
+               .call(d3.axisBottom(x));
+            // Add the Y Axis
+            svgTwo.append("g")
+               .call(d3.axisLeft(y));
+
+            // add the text labels
+            var xLabel = svgTwo.append("text")
+                            .attr("class", "label")
+                            .text(xVal)
+                            .attr("x", width - 20)
+                            .attr("y", height-10);
+
+            var yLabel = svgTwo.append("text")
+                            .attr("class", "label")
+                            .text(yVal)
+                            .attr("y", -10)
+                            .attr("transform", "rotate(90)")
+                            .style("text-anchor", "start");
+            
+            svgTwo.append("path")
+              .datum(data)
+              .attr("class", "line")
+              .attr("d", line);
+    
+        });
+        
+        // Put your part three & four code here ***********************
+        
+         anscombeThree = d3.csv("/projectOne_anscombesQuartet/data/anscombe_I.csv", function(error, data){
+    
+            if(error) throw error;
+            
+            data.forEach(function(d){
+                
+                d.x = +d.x
+                d.y = +d.y
+                
+            });
+             
+             //Sort data by x value
+            data.sort(function(a, b){return a.x - b.x});
+            
+            console.log(data);
+            checkDataset(data);
+             
+            //Scale the range of the data
+            x.domain([0,d3.max(data, function(d){return d.x;})])
+            y.domain([0, d3.max(data, function(d){return d.y;})])
+           
+            //Line function
+            var line = d3.line()
+            .x(function(d) { return x(d.x); })
+            .y(function(d) { return y(d.y); });
+            
+             
+             //For ToolTip Interaction
+            var div = d3.select("body").append("div")
+                        .attr("class", "tooltip")
+                        .style("opacity", 0);
+        
+            // Add the scatterplot points
+            svgThree.selectAll("circle")
+               .data(data)
+               .enter()
+               .append("circle")
+               .attr("r", 5)//radius of circle
+               .attr("cx", function(d){return x(d[xVal]);})
+               .attr("cy", function(d){return y(d[yVal]);})
+               .attr("fill", "lightblue")
+               .on("mouseover", function(d) {
+               svgThree.selectAll("circle").transition()
+                .duration(500)
+                .attr("fill","red")
+                })
+               .on("click", function(d) {
+                div.transition()
+                .duration(200)
+                .style("opacity", .9);
+                div.html(d.x + "<br/>" + d.y)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                div.transition()
+                .duration(500)
+                .style("opacity", 0)
+                svgThree.selectAll("circle").transition()
+                .duration(500)
+                .attr("fill","lightblue")
+                ;
+                })
+               //.ease(d3.easeBounce)
+               //.duration(4000)
+               //.attr("r", function(d){return d["x"]});
+
+            // Add the X Axis
+            svgThree.append("g")
+               .attr("transform", "translate(0, " + height +")")
+               .call(d3.axisBottom(x));
+            // Add the Y Axis
+            svgThree.append("g")
+               .call(d3.axisLeft(y));
+
+            // add the text labels
+            var xLabel = svgThree.append("text")
+                            .attr("class", "label")
+                            .text(xVal)
+                            .attr("x", width - 20)
+                            .attr("y", height-10);
+
+            var yLabel = svgThree.append("text")
+                            .attr("class", "label")
+                            .text(yVal)
+                            .attr("y", -10)
+                            .attr("transform", "rotate(90)")
+                            .style("text-anchor", "start");
+            
+            svgThree.append("path")
+              .datum(data)
+              .attr("class", "line")
+              .attr("d", line);
+    
+        });
+        
+        // Put your part five code here ***********************
+        
+        anscombeI = d3.csv("/projectOne_anscombesQuartet/data/anscombe_I.csv", function(error, data){
+    
+            if(error) throw error;
+            
+            //Convert string to numbers
+            data.forEach(function(d){
+                
+                d.x = +d.x
+                d.y = +d.y
+                
+            });
+        
+            //Sort data by x value
+            data.sort(function(a, b){return a.x - b.x});
+            
+            console.log(data);
+            checkDataset(data);
+             
+            //Scale the range of the data
+            x.domain([0,d3.max(data, function(d){return d.x;})])
+            y.domain([0, d3.max(data, function(d){return d.y;})])
+           
+            
+            //Create a line between datasets
+            var line = d3.line()
+            .x(function(d) { return x(d.x); })
+            .y(function(d) { return y(d.y); });
+            
+            
+        
+            // Add the scatterplot points
+            svgI.selectAll("circle")
+               .data(data)
+               .enter()
+               .append("circle")
+               .attr("r", 5)//radius of circle
+               .attr("cx", function(d){return x(d[xVal]);})
+               .attr("cy", function(d){return y(d[yVal]);})
+               .attr("fill", "lightblue")
+               .transition()
+               //.ease(d3.easeBounce)
+               //.duration(4000)
+               //.attr("r", function(d){return d["x"]});
+
+            // Add the X Axis
+            svgI.append("g")
+               .attr("transform", "translate(0, " + height +")")
+               .call(d3.axisBottom(x));
+            // Add the Y Axis
+            svgI.append("g")
+               .call(d3.axisLeft(y));
+
+            // add the text labels
+            var xLabel = svgI.append("text")
+                            .attr("class", "label")
+                            .text(xVal)
+                            .attr("x", width - 20)
+                            .attr("y", height-10);
+
+            var yLabel = svgI.append("text")
+                            .attr("class", "label")
+                            .text(yVal)
+                            .attr("y", -10)
+                            .attr("transform", "rotate(90)")
+                            .style("text-anchor", "start");
+            
+            //append the line
+//            svgOne.append("path")
+//              .datum(data)
+//              .attr("class", "line")
+//              .attr("d", line);
+    
+        });
+        
+        
+        
+        anscombeII = d3.csv("/projectOne_anscombesQuartet/data/anscombe_II.csv", function(error, data){
+    
+            if(error) throw error;
+            
+            //Convert string to numbers
+            data.forEach(function(d){
+                
+                d.x = +d.x
+                d.y = +d.y
+                
+            });
+        
+            //Sort data by x value
+            data.sort(function(a, b){return a.x - b.x});
+            
+            console.log(data);
+            checkDataset(data);
+             
+            //Scale the range of the data
+            x.domain([0,d3.max(data, function(d){return d.x;})])
+            y.domain([0, d3.max(data, function(d){return d.y;})])
+           
+            
+            //Create a line between datasets
+            var line = d3.line()
+            .x(function(d) { return x(d.x); })
+            .y(function(d) { return y(d.y); });
+            
+            
+        
+            // Add the scatterplot points
+            svgII.selectAll("circle")
+               .data(data)
+               .enter()
+               .append("circle")
+               .attr("r", 5)//radius of circle
+               .attr("cx", function(d){return x(d[xVal]);})
+               .attr("cy", function(d){return y(d[yVal]);})
+               .attr("fill", "lightblue")
+               .transition()
+               //.ease(d3.easeBounce)
+               //.duration(4000)
+               //.attr("r", function(d){return d["x"]});
+
+            // Add the X Axis
+            svgII.append("g")
+               .attr("transform", "translate(0, " + height +")")
+               .call(d3.axisBottom(x));
+            // Add the Y Axis
+            svgII.append("g")
+               .call(d3.axisLeft(y));
+
+            // add the text labels
+            var xLabel = svgII.append("text")
+                            .attr("class", "label")
+                            .text(xVal)
+                            .attr("x", width - 20)
+                            .attr("y", height-10);
+
+            var yLabel = svgII.append("text")
+                            .attr("class", "label")
+                            .text(yVal)
+                            .attr("y", -10)
+                            .attr("transform", "rotate(90)")
+                            .style("text-anchor", "start");
+            
+            //append the line
+//            svgOne.append("path")
+//              .datum(data)
+//              .attr("class", "line")
+//              .attr("d", line);
+    
+        });
+        
+        
+        anscombeIII = d3.csv("/projectOne_anscombesQuartet/data/anscombe_III.csv", function(error, data){
+    
+            if(error) throw error;
+            
+            //Convert string to numbers
+            data.forEach(function(d){
+                
+                d.x = +d.x
+                d.y = +d.y
+                
+            });
+        
+            //Sort data by x value
+            data.sort(function(a, b){return a.x - b.x});
+            
+            console.log(data);
+            checkDataset(data);
+             
+            //Scale the range of the data
+            x.domain([0,d3.max(data, function(d){return d.x;})])
+            y.domain([0, d3.max(data, function(d){return d.y;})])
+           
+            
+            //Create a line between datasets
+            var line = d3.line()
+            .x(function(d) { return x(d.x); })
+            .y(function(d) { return y(d.y); });
+            
+            
+        
+            // Add the scatterplot points
+            svgIII.selectAll("circle")
+               .data(data)
+               .enter()
+               .append("circle")
+               .attr("r", 5)//radius of circle
+               .attr("cx", function(d){return x(d[xVal]);})
+               .attr("cy", function(d){return y(d[yVal]);})
+               .attr("fill", "lightblue")
+               .transition()
+               //.ease(d3.easeBounce)
+               //.duration(4000)
+               //.attr("r", function(d){return d["x"]});
+
+            // Add the X Axis
+            svgIII.append("g")
+               .attr("transform", "translate(0, " + height +")")
+               .call(d3.axisBottom(x));
+            // Add the Y Axis
+            svgIII.append("g")
+               .call(d3.axisLeft(y));
+
+            // add the text labels
+            var xLabel = svgIII.append("text")
+                            .attr("class", "label")
+                            .text(xVal)
+                            .attr("x", width - 20)
+                            .attr("y", height-10);
+
+            var yLabel = svgIII.append("text")
+                            .attr("class", "label")
+                            .text(yVal)
+                            .attr("y", -10)
+                            .attr("transform", "rotate(90)")
+                            .style("text-anchor", "start");
+            
+            //append the line
+//            svgOne.append("path")
+//              .datum(data)
+//              .attr("class", "line")
+//              .attr("d", line);
+    
+        });
+        
+        
+        anscombeIV = d3.csv("/projectOne_anscombesQuartet/data/anscombe_IV.csv", function(error, data){
+    
+            if(error) throw error;
+            
+            //Convert string to numbers
+            data.forEach(function(d){
+                
+                d.x = +d.x
+                d.y = +d.y
+                
+            });
+        
+            //Sort data by x value
+            data.sort(function(a, b){return a.x - b.x});
+            
+            console.log(data);
+            checkDataset(data);
+             
+            //Scale the range of the data
+            x.domain([0,d3.max(data, function(d){return d.x;})])
+            y.domain([0, d3.max(data, function(d){return d.y;})])
+           
+            
+            //Create a line between datasets
+            var line = d3.line()
+            .x(function(d) { return x(d.x); })
+            .y(function(d) { return y(d.y); });
+            
+            
+        
+            // Add the scatterplot points
+            svgIV.selectAll("circle")
+               .data(data)
+               .enter()
+               .append("circle")
+               .attr("r", 5)//radius of circle
+               .attr("cx", function(d){return x(d[xVal]);})
+               .attr("cy", function(d){return y(d[yVal]);})
+               .attr("fill", "lightblue")
+               .transition()
+               //.ease(d3.easeBounce)
+               //.duration(4000)
+               //.attr("r", function(d){return d["x"]});
+
+            // Add the X Axis
+            svgIV.append("g")
+               .attr("transform", "translate(0, " + height +")")
+               .call(d3.axisBottom(x));
+            // Add the Y Axis
+            svgIV.append("g")
+               .call(d3.axisLeft(y));
+
+            // add the text labels
+            var xLabel = svgIV.append("text")
+                            .attr("class", "label")
+                            .text(xVal)
+                            .attr("x", width - 20)
+                            .attr("y", height-10);
+
+            var yLabel = svgIV.append("text")
+                            .attr("class", "label")
+                            .text(yVal)
+                            .attr("y", -10)
+                            .attr("transform", "rotate(90)")
+                            .style("text-anchor", "start");
+            
+            //append the line
+//            svgOne.append("path")
+//              .datum(data)
+//              .attr("class", "line")
+//              .attr("d", line);
+    
+        });
+        
+        
+        
+           // Leave this to test your data uploading. All data uploading should be above this line
         function checkDataset(dataset) {
             if (dataset.length == 11)
                 $("#partOne").append("<p>data loaded correctly</p>");
@@ -45,11 +677,6 @@
                 $("#partOne").append("<p>data loaded incorrectly. Try using the debugger to help you find the bug!</p>");
         }
         
-        // Put your part two code here ***********************
-        
-        // Put your part three & four code here ***********************
-        
-        // Put your part five code here ***********************
         
     </script>
 </body>
